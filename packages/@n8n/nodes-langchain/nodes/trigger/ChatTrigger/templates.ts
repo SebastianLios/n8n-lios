@@ -1,5 +1,6 @@
-import type { AuthenticationChatOption, LoadPreviousSessionChatOption } from './types';
+import sanitizeHtml from 'sanitize-html';
 
+import type { AuthenticationChatOption, LoadPreviousSessionChatOption } from './types';
 export function createPage({
 	instanceId,
 	webhookUrl,
@@ -10,6 +11,8 @@ export function createPage({
 	authentication,
 	allowFileUploads,
 	allowedFilesMimeTypes,
+	customCss,
+	enableStreaming,
 }: {
 	instanceId: string;
 	webhookUrl?: string;
@@ -23,6 +26,8 @@ export function createPage({
 	authentication: AuthenticationChatOption;
 	allowFileUploads?: boolean;
 	allowedFilesMimeTypes?: string;
+	customCss?: string;
+	enableStreaming?: boolean;
 }) {
 	const validAuthenticationOptions: AuthenticationChatOption[] = [
 		'none',
@@ -41,6 +46,11 @@ export function createPage({
 	const sanitizedShowWelcomeScreen = !!showWelcomeScreen;
 	const sanitizedAllowFileUploads = !!allowFileUploads;
 	const sanitizedAllowedFilesMimeTypes = allowedFilesMimeTypes?.toString() ?? '';
+	const sanitizedCustomCss = sanitizeHtml(`<style>${customCss?.toString() ?? ''}</style>`, {
+		allowedTags: ['style'],
+		allowedAttributes: false,
+	});
+
 	const sanitizedLoadPreviousSession = validLoadPreviousSessionOptions.includes(
 		loadPreviousSession as LoadPreviousSessionChatOption,
 	)
@@ -63,10 +73,11 @@ export function createPage({
 					height: 100%;
 				}
 			</style>
+			${sanitizedCustomCss}
 		</head>
 		<body>
 			<script type="module">
-				import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+				import { createChat } from 'https://cdn.jsdelivr.net/npm/n8n-chat-atekron@0.49.0/dist/chat.bundle.es.js';
 
 				(async function () {
 					const authentication = '${sanitizedAuthentication}';
@@ -115,6 +126,7 @@ export function createPage({
 							${en ? `en: ${JSON.stringify(en)},` : ''}
 						},
 						${initialMessages.length ? `initialMessages: ${JSON.stringify(initialMessages)},` : ''}
+						enableStreaming: ${!!enableStreaming},
 					});
 				})();
 			</script>

@@ -9,4 +9,6 @@ services:
       volta install node@22.16.0
       volta install pnpm@8.15.4
       pnpm install
+      pnpm build
     startCommand: pnpm start
+    plan: standard

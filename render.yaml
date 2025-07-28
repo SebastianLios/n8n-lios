@@ -3,7 +3,10 @@ services:
     name: n8n-lios-self-hosted
     env: node
     buildCommand: |
-      corepack enable
-      corepack prepare pnpm@8.15.4 --activate
+      curl -fsSL https://get.volta.sh | bash
+      export VOLTA_HOME="$HOME/.volta"
+      export PATH="$VOLTA_HOME/bin:$PATH"
+      volta install node@22.16.0
+      volta install pnpm@8.15.4
       pnpm install
     startCommand: pnpm start

@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: n8n-lios-self-hosted
+    env: node
+    buildCommand: |
+      corepack enable
+      corepack prepare pnpm@8.15.4 --activate
+      pnpm install
+    startCommand: pnpm start
